@@ -198,7 +198,11 @@ body {
 
 body.no-scroll {
     overflow: hidden;
-    height: 100vh;
+    height: 100dvh;
+}
+
+:root {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 img {
@@ -847,9 +851,8 @@ a {
     }
 }
 
-// =========================
 // MODAL
-// =========================
+
 .modal {
     position: fixed;
     inset: 0;
@@ -858,6 +861,7 @@ a {
     visibility: hidden;
     pointer-events: none;
     transition: $transition;
+
 
     &.is-open {
         opacity: 1;
@@ -884,7 +888,7 @@ a {
     &__dialog {
         position: relative;
         width: min(680px, calc(100% - 24px));
-        max-height: calc(100vh - 40px);
+        max-height: calc(100dvh - 40px);
         overflow-y: auto;
         margin: 20px auto;
         border-radius: 24px;
@@ -944,6 +948,7 @@ a {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 18px;
+        padding-bottom: 8px;
     }
 
     &__group {
@@ -972,6 +977,7 @@ a {
         color: #fff;
         padding: 14px 16px;
         outline: none;
+        scroll-margin-bottom: 140px;
         transition: $transition;
 
         &::placeholder {
@@ -995,13 +1001,24 @@ a {
     }
 
     &__actions {
+        position: sticky;
+        bottom: 0;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
         margin-top: 28px;
-        padding-top: 22px;
+        padding: 16px 0 calc(16px + var(--safe-bottom));
         border-top: 1px solid rgba(255, 255, 255, 0.08);
+        // background: linear-gradient(
+        //     180deg,
+        //     rgba(10, 16, 27, 0),
+        //     rgba(10, 16, 27, 0.92) 18%,
+        //     rgba(10, 16, 27, 0.98) 100%
+        // );
+        // backdrop-filter: blur(10px);
+        // -webkit-backdrop-filter: blur(10px);
+        // z-index: 5;
     }
 
     &__actions-right {
@@ -1302,11 +1319,15 @@ a {
         &__actions {
             flex-direction: column;
             align-items: stretch;
+            gap: 12px;
+            padding-top: 14px;
+            padding-bottom: calc(14px + var(--safe-bottom));
         }
 
         &__actions-right {
             width: 100%;
             flex-direction: column;
+            gap: 10px;
         }
 
         &__btn {

@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="site/styles/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="site/img/logo-circle.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#080d18">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Kanban">
+    <link rel="apple-touch-icon" href="/site/img/icons/apple-touch-icon.png">
     <title>ShumDevKanban — планируй свои задачи стильно и функционально</title>
-    <meta name="description" content="ShumDevKanban — kanban-доска для личного планирования задач в премиальном интерфейсе.">
+    <meta name="description"
+        content="ShumDevKanban — kanban-доска для личного планирования задач в премиальном интерфейсе.">
 </head>
+
 <body>
     <header class="header">
         <div class="container">
@@ -205,27 +213,14 @@
                 <div class="task-form__grid">
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskTitle">Название задачи</label>
-                        <input
-                            class="task-form__input"
-                            type="text"
-                            id="taskTitle"
-                            name="taskTitle"
-                            placeholder="Например: Сделать drag & drop"
-                            maxlength="100"
-                            required
-                        >
+                        <input class="task-form__input" type="text" id="taskTitle" name="taskTitle"
+                            placeholder="Например: Сделать drag & drop" maxlength="100" required>
                     </div>
 
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskDescription">Описание</label>
-                        <textarea
-                            class="task-form__textarea"
-                            id="taskDescription"
-                            name="taskDescription"
-                            placeholder="Коротко опиши задачу"
-                            rows="5"
-                            maxlength="400"
-                        ></textarea>
+                        <textarea class="task-form__textarea" id="taskDescription" name="taskDescription"
+                            placeholder="Коротко опиши задачу" rows="5" maxlength="400"></textarea>
                     </div>
 
                     <div class="task-form__group">
@@ -249,12 +244,7 @@
 
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskDueDate">Дедлайн</label>
-                        <input
-                            class="task-form__input"
-                            type="date"
-                            id="taskDueDate"
-                            name="taskDueDate"
-                        >
+                        <input class="task-form__input" type="date" id="taskDueDate" name="taskDueDate">
                     </div>
                 </div>
 
@@ -327,4 +317,5 @@
 
     <script src="site/scripts/main.js"></script>
 </body>
+
 </html>
