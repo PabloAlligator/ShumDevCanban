@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="site/styles/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="site/img/logo-circle.png">
+    <title>ShumDevKanban — планируй свои задачи стильно и функционально</title>
+    <meta name="description" content="ShumDevKanban — kanban-доска для личного планирования задач в премиальном интерфейсе.">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="#dashboard" class="logo">
+                    <div class="logo-icon">
+                        <img src="site/img/logo.png" alt="Логотип ShumDevKanban">
+                    </div>
+                </a>
+
+                <nav class="nav">
+                    <a href="#dashboard" class="nav-link">Dashboard</a>
+                    <a href="#board" class="nav-link">Доска</a>
+                    <a href="#focus" class="nav-link">Фокус</a>
+                    <a href="#stats" class="nav-link">Статистика</a>
+                    <a href="#footer" class="nav-link">Контакты</a>
+                </nav>
+
+                <div class="header-actions">
+                    <button class="header-btn header-btn--ghost" type="button" id="clearDoneBtn">
+                        Очистить Done
+                    </button>
+
+                    <button class="header-btn header-btn--primary" type="button" id="openTaskModalBtn">
+                        + Новая задача
+                    </button>
+                </div>
+
+                <button class="burger" aria-label="Меню">
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="hero" id="dashboard">
+            <div class="container">
+                <div class="hero__wrapper">
+                    <div class="hero__content">
+                        <span class="hero__label">ShumDevKanban</span>
+
+                        <h1 class="hero__title">
+                            Планируй задачи
+                            <span>стильно, быстро и без хаоса</span>
+                        </h1>
+
+                        <p class="hero__text">
+                            Личная kanban-доска в вашем интерфейсе:
+                            задачи, фокус, дедлайны и порядок в одном месте.
+                        </p>
+
+                        <div class="hero__actions">
+                            <button class="hero__btn hero__btn--primary" type="button" id="heroCreateTaskBtn">
+                                Создать задачу
+                            </button>
+
+                            <a href="#board" class="hero__btn hero__btn--ghost">
+                                Открыть доску
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="hero__stats" id="stats">
+                        <div class="hero__stat-card">
+                            <span class="hero__stat-number" id="totalTasksCount">0</span>
+                            <span class="hero__stat-text">Всего задач</span>
+                        </div>
+
+                        <div class="hero__stat-card">
+                            <span class="hero__stat-number" id="inProgressTasksCount">0</span>
+                            <span class="hero__stat-text">В работе</span>
+                        </div>
+
+                        <div class="hero__stat-card">
+                            <span class="hero__stat-number" id="doneTasksCount">0</span>
+                            <span class="hero__stat-text">Завершено</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="focus" id="focus">
+            <div class="container">
+                <div class="focus__box">
+                    <div class="focus__content">
+                        <span class="focus__label">Focus Mode</span>
+                        <h2 class="focus__title">Сегодня в приоритете</h2>
+                        <p class="focus__text" id="focusTaskText">
+                            Пока нет задач в колонке Today. Добавь задачу и перенеси её в фокус.
+                        </p>
+                    </div>
+
+                    <div class="focus__meta">
+                        <span class="focus__meta-item">
+                            Today:
+                            <strong id="todayTasksCount">0</strong>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="board" id="board">
+            <div class="container">
+                <div class="board__top">
+                    <div class="board__heading">
+                        <span class="board__label">Task Board</span>
+                        <h2 class="board__title">Моя Kanban-доска</h2>
+                    </div>
+
+                    <button class="board__add-btn" type="button" id="boardCreateTaskBtn">
+                        <span>+ Новая задача</span>
+                    </button>
+                </div>
+
+                <div class="board__columns">
+                    <article class="board-column" data-status="backlog">
+                        <div class="board-column__head">
+                            <h3>Backlog</h3>
+                            <span class="board-column__count" id="backlogCount">0</span>
+                        </div>
+
+                        <div class="board-column__body task-list" id="backlogTasks"></div>
+
+                        <div class="board-column__empty empty-state" data-empty="backlog">
+                            <p>Здесь пока пусто. Добавь идеи и задачи в backlog.</p>
+                        </div>
+                    </article>
+
+                    <article class="board-column" data-status="today">
+                        <div class="board-column__head">
+                            <h3>Today</h3>
+                            <span class="board-column__count" id="todayCount">0</span>
+                        </div>
+
+                        <div class="board-column__body task-list" id="todayTasks"></div>
+
+                        <div class="board-column__empty empty-state" data-empty="today">
+                            <p>На сегодня пока нет задач. Выдели главное.</p>
+                        </div>
+                    </article>
+
+                    <article class="board-column" data-status="progress">
+                        <div class="board-column__head">
+                            <h3>In Progress</h3>
+                            <span class="board-column__count" id="progressCount">0</span>
+                        </div>
+
+                        <div class="board-column__body task-list" id="progressTasks"></div>
+
+                        <div class="board-column__empty empty-state" data-empty="progress">
+                            <p>Нет активных задач. Самое время начать работу.</p>
+                        </div>
+                    </article>
+
+                    <article class="board-column" data-status="done">
+                        <div class="board-column__head">
+                            <h3>Done</h3>
+                            <span class="board-column__count" id="doneCount">0</span>
+                        </div>
+
+                        <div class="board-column__body task-list" id="doneTasks"></div>
+
+                        <div class="board-column__empty empty-state" data-empty="done">
+                            <p>Завершённые задачи появятся здесь.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="modal" id="taskModal" aria-hidden="true">
+        <div class="modal__overlay" id="taskModalOverlay"></div>
+
+        <div class="modal__dialog" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+            <div class="modal__header">
+                <div class="modal__header-content">
+                    <span class="modal__label">Task Editor</span>
+                    <h2 class="modal__title" id="taskModalTitle">Создать задачу</h2>
+                </div>
+
+                <button class="modal__close" type="button" id="closeTaskModalBtn" aria-label="Закрыть модальное окно">
+                    ×
+                </button>
+            </div>
+
+            <form class="task-form" id="taskForm">
+                <input type="hidden" id="taskId">
+
+                <div class="task-form__grid">
+                    <div class="task-form__group task-form__group--full">
+                        <label class="task-form__label" for="taskTitle">Название задачи</label>
+                        <input
+                            class="task-form__input"
+                            type="text"
+                            id="taskTitle"
+                            name="taskTitle"
+                            placeholder="Например: Сделать drag & drop"
+                            maxlength="100"
+                            required
+                        >
+                    </div>
+
+                    <div class="task-form__group task-form__group--full">
+                        <label class="task-form__label" for="taskDescription">Описание</label>
+                        <textarea
+                            class="task-form__textarea"
+                            id="taskDescription"
+                            name="taskDescription"
+                            placeholder="Коротко опиши задачу"
+                            rows="5"
+                            maxlength="400"
+                        ></textarea>
+                    </div>
+
+                    <div class="task-form__group">
+                        <label class="task-form__label" for="taskPriority">Приоритет</label>
+                        <select class="task-form__select" id="taskPriority" name="taskPriority">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+
+                    <div class="task-form__group">
+                        <label class="task-form__label" for="taskStatus">Статус</label>
+                        <select class="task-form__select" id="taskStatus" name="taskStatus">
+                            <option value="backlog">Backlog</option>
+                            <option value="today">Today</option>
+                            <option value="progress">In Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </div>
+
+                    <div class="task-form__group task-form__group--full">
+                        <label class="task-form__label" for="taskDueDate">Дедлайн</label>
+                        <input
+                            class="task-form__input"
+                            type="date"
+                            id="taskDueDate"
+                            name="taskDueDate"
+                        >
+                    </div>
+                </div>
+
+                <div class="task-form__actions">
+                    <button class="task-form__btn task-form__btn--danger" type="button" id="deleteTaskBtn">
+                        Удалить
+                    </button>
+
+                    <div class="task-form__actions-right">
+                        <button class="task-form__btn task-form__btn--ghost" type="button" id="cancelTaskBtn">
+                            Отмена
+                        </button>
+
+                        <button class="task-form__btn task-form__btn--primary" type="submit" id="saveTaskBtn">
+                            Сохранить
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <template id="taskCardTemplate">
+        <div class="task-card" draggable="true">
+            <div class="task-card__top">
+                <span class="task-card__badge"></span>
+                <button class="task-card__menu-btn" type="button" aria-label="Редактировать задачу">
+                    ✎
+                </button>
+            </div>
+
+            <h4 class="task-card__title"></h4>
+
+            <p class="task-card__text"></p>
+
+            <div class="task-card__bottom">
+                <div class="task-card__meta">
+                    <span class="task-card__status-label"></span>
+                    <span class="task-card__date"></span>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <footer class="footer" id="footer">
+        <div class="container">
+            <div class="footer-links">
+                <a href="#dashboard" class="footer-link">Dashboard</a>
+                <a href="#board" class="footer-link">Доска</a>
+                <a href="#focus" class="footer-link">Фокус</a>
+                <a href="#stats" class="footer-link">Статистика</a>
+            </div>
+
+            <p class="copyright">
+                © 2026. ShumDevKanban. Личная kanban-доска для задач, фокуса и продуктивной работы.
+            </p>
+
+            <div class="footer__legal">
+                <p>
+                    Разработка: Шумилов Павел Дмитриевич
+                </p>
+
+                <div class="footer__legal-links">
+                    <a href="mailto:infoShumdev@mail.ru">infoShumdev@mail.ru</a>
+                    <a href="tel:+79233906649">+7 (923) 390-66-49</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="site/scripts/main.js"></script>
+</body>
+</html>
