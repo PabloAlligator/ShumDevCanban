@@ -1,4 +1,5 @@
 const STORAGE_KEY = 'shumdev-kanban-tasks';
+let deferredInstallPrompt = null;
 
 const appState = {
     tasks: [],
@@ -11,6 +12,7 @@ const appState = {
         progress: false,
         done: false,
     },
+    activeTag: null,
 };
 
 const statusMap = {
@@ -69,6 +71,7 @@ const elements = {
     taskIdInput: document.getElementById('taskId'),
     taskTitleInput: document.getElementById('taskTitle'),
     taskDescriptionInput: document.getElementById('taskDescription'),
+    taskTagsInput: document.getElementById('taskTags'),
     taskPriorityInput: document.getElementById('taskPriority'),
     taskStatusInput: document.getElementById('taskStatus'),
     taskDueDateInput: document.getElementById('taskDueDate'),
@@ -78,6 +81,7 @@ const elements = {
     boardCreateTaskBtn: document.getElementById('boardCreateTaskBtn'),
     clearDoneBtn: document.getElementById('clearDoneBtn'),
     themeToggle: document.getElementById('themeToggle'),
+    installAppBtn: document.getElementById('installAppBtn'),
 
     totalTasksCount: document.getElementById('totalTasksCount'),
     inProgressTasksCount: document.getElementById('inProgressTasksCount'),
@@ -95,6 +99,7 @@ const elements = {
 
 function initApp() {
     initTheme();
+    setupInstallPrompt();
     bindBaseEvents();
     loadTasks();
     renderApp();
@@ -126,6 +131,41 @@ function updateThemeIcon(theme) {
         : 'Переключить на светлую тему';
 }
 
+function setupInstallPrompt() {
+    window.addEventListener('beforeinstallprompt', (event) => {
+        event.preventDefault();
+        deferredInstallPrompt = event;
+
+        if (elements.installAppBtn) {
+            elements.installAppBtn.classList.remove('is-hidden');
+        }
+    });
+
+    window.addEventListener('appinstalled', () => {
+        deferredInstallPrompt = null;
+
+        if (elements.installAppBtn) {
+            elements.installAppBtn.classList.add('is-hidden');
+        }
+    });
+}
+
+async function handleInstallApp() {
+    if (!deferredInstallPrompt) return;
+
+    deferredInstallPrompt.prompt();
+
+    const choiceResult = await deferredInstallPrompt.userChoice;
+
+    if (choiceResult.outcome === 'accepted') {
+        deferredInstallPrompt = null;
+
+        if (elements.installAppBtn) {
+            elements.installAppBtn.classList.add('is-hidden');
+        }
+    }
+}
+
 function bindBaseEvents() {
     window.addEventListener('scroll', handleHeaderScroll);
 
@@ -155,6 +195,10 @@ function bindBaseEvents() {
 
     if (elements.themeToggle) {
         elements.themeToggle.addEventListener('click', toggleTheme);
+    }
+
+    if (elements.installAppBtn) {
+        elements.installAppBtn.addEventListener('click', handleInstallApp);
     }
 
     if (elements.closeTaskModalBtn) {
@@ -251,6 +295,7 @@ function openEditModal(taskId) {
     elements.taskPriorityInput.value = task.priority;
     elements.taskStatusInput.value = task.status;
     elements.taskDueDateInput.value = task.dueDate || '';
+    elements.taskTagsInput.value = (task.tags || []).join(', ');
 
     openModal();
 }
@@ -280,9 +325,20 @@ function resetForm() {
     elements.taskPriorityInput.value = 'medium';
     elements.taskStatusInput.value = 'backlog';
     elements.taskDueDateInput.value = '';
+    elements.taskTagsInput.value = '';
     appState.editingTaskId = null;
 }
 
+//  функция для тегов
+function parseTags(value) {
+    return value
+        .split(',')
+        .map((tag) => tag.trim().toLowerCase())
+        .filter(Boolean)
+        .filter((tag, index, array) => array.indexOf(tag) === index);
+}
+
+//  обработчик формы
 function handleTaskSubmit(event) {
     event.preventDefault();
 
@@ -291,6 +347,7 @@ function handleTaskSubmit(event) {
     const priority = elements.taskPriorityInput.value;
     const status = elements.taskStatusInput.value;
     const dueDate = elements.taskDueDateInput.value;
+    const tags = parseTags(elements.taskTagsInput.value);
 
     if (!title) {
         elements.taskTitleInput.focus();
@@ -305,6 +362,7 @@ function handleTaskSubmit(event) {
             priority,
             status,
             dueDate,
+            tags,
         });
     } else {
         createTask({
@@ -313,6 +371,7 @@ function handleTaskSubmit(event) {
             priority,
             status,
             dueDate,
+            tags,
         });
     }
 
@@ -328,6 +387,7 @@ function createTask(taskData) {
         priority: taskData.priority,
         status: taskData.status,
         dueDate: taskData.dueDate,
+        tags: taskData.tags || [],
         createdAt: new Date().toISOString(),
     };
 
@@ -346,6 +406,7 @@ function updateTask(updatedTask) {
             priority: updatedTask.priority,
             status: updatedTask.status,
             dueDate: updatedTask.dueDate,
+            tags: updatedTask.tags || [],
         };
     });
 
@@ -436,6 +497,12 @@ function renderTasks() {
             break;
     }
 
+    if (appState.activeTag) {
+        filteredTasks = filteredTasks.filter(
+            (task) => task.tags && task.tags.includes(appState.activeTag)
+        );
+    }
+
     const sortedTasks = filteredTasks.sort((a, b) => {
         const aTime = new Date(a.createdAt).getTime();
         const bTime = new Date(b.createdAt).getTime();
@@ -503,6 +570,7 @@ function createTaskCard(task) {
     const statusLabel = template.querySelector('.task-card__status-label');
     const date = template.querySelector('.task-card__date');
     const editButton = template.querySelector('.task-card__menu-btn');
+    const tagsContainer = template.querySelector('.task-card__tags');
 
     taskCard.dataset.taskId = task.id;
 
@@ -523,6 +591,25 @@ function createTaskCard(task) {
 
     title.textContent = task.title;
     text.textContent = task.description || 'Без описания';
+
+    if (tagsContainer) {
+        tagsContainer.innerHTML = '';
+
+        if (task.tags && task.tags.length) {
+            task.tags.forEach((tag) => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'task-card__tag';
+                tagElement.textContent = `#${tag}`;
+                tagElement.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    appState.activeTag = tag;
+                    renderApp();
+                });
+                tagsContainer.appendChild(tagElement);
+            });
+        }
+    }
+
     statusLabel.textContent = statusMap[task.status]?.label || 'Unknown';
 
     if (task.dueDate) {

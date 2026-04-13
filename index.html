@@ -3,17 +3,29 @@
 
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="site/styles/main.css">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="site/img/logo-circle.png">
-    <link rel="manifest" href="/manifest.webmanifest">
-    <meta name="theme-color" content="#080d18">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-title" content="Kanban">
-    <link rel="apple-touch-icon" href="/site/img/icons/apple-touch-icon.png">
-    <title>ShumDevKanban — планируй свои задачи стильно и функционально</title>
+
+    <!-- SEO -->
+    <title>ShumDev Kanban — управление задачами</title>
     <meta name="description"
         content="ShumDevKanban — kanban-доска для личного планирования задач в премиальном интерфейсе.">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.webmanifest">
+    <meta name="theme-color" content="#080d18">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Kanban">
+
+    <!-- Icons (ТОЛЬКО ТВОИ ФАЙЛЫ) -->
+    <link rel="icon" type="image/png" sizes="72x72" href="/site/img/icons/72.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/site/img/icons/96.png">
+    <link rel="icon" type="image/png" sizes="128x128" href="/site/img/icons/128.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/site/img/icons/192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/site/img/icons/512.png">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="site/styles/main.css">
 </head>
 
 <body>
@@ -84,6 +96,10 @@
                             <a href="#board" class="hero__btn hero__btn--ghost">
                                 Открыть доску
                             </a>
+
+                            <button class="hero__btn hero__btn--ghost is-hidden" type="button" id="installAppBtn">
+                                Установить приложение
+                            </button>
                         </div>
                     </div>
 
@@ -228,18 +244,29 @@
                 <input type="hidden" id="taskId">
 
                 <div class="task-form__grid">
+
+                    <!-- Название -->
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskTitle">Название задачи</label>
                         <input class="task-form__input" type="text" id="taskTitle" name="taskTitle"
-                            placeholder="Например: Сделать drag & drop" maxlength="100" required>
+                            placeholder="Например: Сделать drag & drop" maxlength="100" required autocomplete="off">
                     </div>
 
+                    <!-- Описание -->
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskDescription">Описание</label>
                         <textarea class="task-form__textarea" id="taskDescription" name="taskDescription"
                             placeholder="Коротко опиши задачу" rows="5" maxlength="400"></textarea>
                     </div>
 
+                    <!-- Теги -->
+                    <div class="task-form__group task-form__group--full">
+                        <label class="task-form__label" for="taskTags">Теги <span>(через запятую)</span></label>
+                        <input class="task-form__input" type="text" id="taskTags" name="taskTags"
+                            placeholder="работа, срочно, дизайн" maxlength="120" autocomplete="off">
+                    </div>
+
+                    <!-- Приоритет -->
                     <div class="task-form__group">
                         <label class="task-form__label" for="taskPriority">Приоритет</label>
                         <select class="task-form__select" id="taskPriority" name="taskPriority">
@@ -249,6 +276,7 @@
                         </select>
                     </div>
 
+                    <!-- Статус -->
                     <div class="task-form__group">
                         <label class="task-form__label" for="taskStatus">Статус</label>
                         <select class="task-form__select" id="taskStatus" name="taskStatus">
@@ -259,10 +287,12 @@
                         </select>
                     </div>
 
+                    <!-- Дедлайн -->
                     <div class="task-form__group task-form__group--full">
                         <label class="task-form__label" for="taskDueDate">Дедлайн</label>
                         <input class="task-form__input" type="date" id="taskDueDate" name="taskDueDate">
                     </div>
+
                 </div>
 
                 <div class="task-form__actions">
@@ -294,8 +324,8 @@
             </div>
 
             <h4 class="task-card__title"></h4>
-
             <p class="task-card__text"></p>
+            <div class="task-card__tags"></div>
 
             <div class="task-card__bottom">
                 <div class="task-card__meta">
