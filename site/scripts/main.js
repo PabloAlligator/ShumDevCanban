@@ -68,6 +68,11 @@ const elements = {
     taskForm: document.getElementById('taskForm'),
     taskModalTitle: document.getElementById('taskModalTitle'),
 
+    installHelpModal: document.getElementById('installHelpModal'),
+    installHelpOverlay: document.getElementById('installHelpOverlay'),
+    closeInstallHelpBtn: document.getElementById('closeInstallHelpBtn'),
+    installHelpOkBtn: document.getElementById('installHelpOkBtn'),
+
     taskIdInput: document.getElementById('taskId'),
     taskTitleInput: document.getElementById('taskTitle'),
     taskDescriptionInput: document.getElementById('taskDescription'),
@@ -120,6 +125,22 @@ function toggleTheme() {
     updateThemeIcon(theme);
 }
 
+function openInstallHelpModal() {
+    if (!elements.installHelpModal) return;
+
+    elements.installHelpModal.classList.add('is-open');
+    elements.installHelpModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('no-scroll');
+}
+
+function closeInstallHelpModal() {
+    if (!elements.installHelpModal) return;
+
+    elements.installHelpModal.classList.remove('is-open');
+    elements.installHelpModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('no-scroll');
+}
+
 function updateThemeIcon(theme) {
     if (!elements.themeToggle) return;
 
@@ -130,8 +151,13 @@ function updateThemeIcon(theme) {
         ? 'Переключить на тёмную тему'
         : 'Переключить на светлую тему';
 }
-
 function setupInstallPrompt() {
+    // iPhone / iPad: показываем кнопку вручную, если приложение ещё не установлено
+    if (isIos() && !isInStandaloneMode() && elements.installAppBtn) {
+        elements.installAppBtn.classList.remove('is-hidden');
+    }
+
+    // Android / Chrome
     window.addEventListener('beforeinstallprompt', (event) => {
         event.preventDefault();
         deferredInstallPrompt = event;
@@ -150,8 +176,30 @@ function setupInstallPrompt() {
     });
 }
 
+function isIos() {
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+}
+
+function isInStandaloneMode() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+
 async function handleInstallApp() {
-    if (!deferredInstallPrompt) return;
+    // iPhone / iPad
+    if (isIos() && !isInStandaloneMode()) {
+        openInstallHelpModal();
+        return;
+    }
+
+    // Android / Chrome
+    if (!deferredInstallPrompt) {
+        if (isIos()) {
+            openInstallHelpModal();
+        } else {
+            alert('Установка пока недоступна в этом браузере.');
+        }
+        return;
+    }
 
     deferredInstallPrompt.prompt();
 
@@ -221,15 +269,27 @@ function bindBaseEvents() {
         elements.deleteTaskBtn.addEventListener('click', handleDeleteTask);
     }
 
+    if (elements.closeInstallHelpBtn) {
+        elements.closeInstallHelpBtn.addEventListener('click', closeInstallHelpModal);
+    }
+
+    if (elements.installHelpOverlay) {
+        elements.installHelpOverlay.addEventListener('click', closeInstallHelpModal);
+    }
+
+    if (elements.installHelpOkBtn) {
+        elements.installHelpOkBtn.addEventListener('click', closeInstallHelpModal);
+    }
+
     document.addEventListener('keydown', handleGlobalKeydown);
 
     setupBoardDnD();
 
     const filterButtons = document.querySelectorAll('.filter-btn');
 
-    filterButtons.forEach(btn => {
+    filterButtons.forEach((btn) => {
         btn.addEventListener('click', () => {
-            filterButtons.forEach(b => b.classList.remove('active'));
+            filterButtons.forEach((b) => b.classList.remove('active'));
             btn.classList.add('active');
 
             appState.filter = btn.dataset.filter;
@@ -266,6 +326,10 @@ function closeMobileMenu() {
 function handleGlobalKeydown(event) {
     if (event.key === 'Escape' && elements.taskModal.classList.contains('is-open')) {
         closeModal();
+    }
+
+    if (event.key === 'Escape' && elements.installHelpModal?.classList.contains('is-open')) {
+        closeInstallHelpModal();
     }
 }
 
