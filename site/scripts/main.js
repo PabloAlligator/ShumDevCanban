@@ -4,6 +4,13 @@ const appState = {
     tasks: [],
     editingTaskId: null,
     draggedTaskId: null,
+    filter: 'all',
+    expandedColumns: {
+        backlog: false,
+        today: false,
+        progress: false,
+        done: false,
+    },
 };
 
 const statusMap = {
@@ -28,6 +35,8 @@ const statusMap = {
         countId: 'doneCount',
     },
 };
+
+const TASKS_PREVIEW_LIMIT = 3;
 
 const priorityMap = {
     low: {
@@ -68,6 +77,7 @@ const elements = {
     heroCreateTaskBtn: document.getElementById('heroCreateTaskBtn'),
     boardCreateTaskBtn: document.getElementById('boardCreateTaskBtn'),
     clearDoneBtn: document.getElementById('clearDoneBtn'),
+    themeToggle: document.getElementById('themeToggle'),
 
     totalTasksCount: document.getElementById('totalTasksCount'),
     inProgressTasksCount: document.getElementById('inProgressTasksCount'),
@@ -84,9 +94,36 @@ const elements = {
 };
 
 function initApp() {
+    initTheme();
     bindBaseEvents();
     loadTasks();
     renderApp();
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    document.body.classList.toggle('light', savedTheme === 'light');
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const isLight = document.body.classList.toggle('light');
+    const theme = isLight ? 'light' : 'dark';
+
+    localStorage.setItem('theme', theme);
+    updateThemeIcon(theme);
+}
+
+function updateThemeIcon(theme) {
+    if (!elements.themeToggle) return;
+
+    const isLight = theme === 'light';
+
+    elements.themeToggle.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+    elements.themeToggle.title = isLight
+        ? 'Переключить на тёмную тему'
+        : 'Переключить на светлую тему';
 }
 
 function bindBaseEvents() {
@@ -116,6 +153,10 @@ function bindBaseEvents() {
         elements.clearDoneBtn.addEventListener('click', clearDoneTasks);
     }
 
+    if (elements.themeToggle) {
+        elements.themeToggle.addEventListener('click', toggleTheme);
+    }
+
     if (elements.closeTaskModalBtn) {
         elements.closeTaskModalBtn.addEventListener('click', closeModal);
     }
@@ -139,6 +180,19 @@ function bindBaseEvents() {
     document.addEventListener('keydown', handleGlobalKeydown);
 
     setupBoardDnD();
+
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            appState.filter = btn.dataset.filter;
+
+            renderApp();
+        });
+    });
 }
 
 function handleHeaderScroll() {
@@ -366,19 +420,78 @@ function clearTaskLists() {
 }
 
 function renderTasks() {
-    const sortedTasks = [...appState.tasks].sort((a, b) => {
+    let filteredTasks = [...appState.tasks];
+
+    switch (appState.filter) {
+        case 'active':
+            filteredTasks = filteredTasks.filter((task) => task.status !== 'done');
+            break;
+        case 'done':
+            filteredTasks = filteredTasks.filter((task) => task.status === 'done');
+            break;
+        case 'high':
+            filteredTasks = filteredTasks.filter((task) => task.priority === 'high');
+            break;
+        default:
+            break;
+    }
+
+    const sortedTasks = filteredTasks.sort((a, b) => {
         const aTime = new Date(a.createdAt).getTime();
         const bTime = new Date(b.createdAt).getTime();
         return bTime - aTime;
     });
 
+    const tasksByStatus = {
+        backlog: [],
+        today: [],
+        progress: [],
+        done: [],
+    };
+
     sortedTasks.forEach((task) => {
-        const container = document.getElementById(statusMap[task.status]?.containerId);
+        if (tasksByStatus[task.status]) {
+            tasksByStatus[task.status].push(task);
+        }
+    });
+
+    Object.entries(tasksByStatus).forEach(([status, tasks]) => {
+        const container = document.getElementById(statusMap[status]?.containerId);
         if (!container) return;
 
-        const taskCard = createTaskCard(task);
-        container.appendChild(taskCard);
+        const isExpanded = appState.expandedColumns[status];
+        const visibleTasks = isExpanded ? tasks : tasks.slice(0, TASKS_PREVIEW_LIMIT);
+
+        visibleTasks.forEach((task) => {
+            const taskCard = createTaskCard(task);
+            container.appendChild(taskCard);
+        });
+
+        renderColumnToggle(status, tasks.length, visibleTasks.length, container);
     });
+}
+
+function renderColumnToggle(status, totalCount, visibleCount, container) {
+    if (totalCount <= TASKS_PREVIEW_LIMIT) return;
+
+    const hiddenCount = totalCount - visibleCount;
+
+    const toggleBtn = document.createElement('button');
+    toggleBtn.type = 'button';
+    toggleBtn.className = 'task-list-toggle';
+
+    if (appState.expandedColumns[status]) {
+        toggleBtn.textContent = 'Свернуть';
+    } else {
+        toggleBtn.textContent = `Показать ещё (${hiddenCount})`;
+    }
+
+    toggleBtn.addEventListener('click', () => {
+        appState.expandedColumns[status] = !appState.expandedColumns[status];
+        renderApp();
+    });
+
+    container.appendChild(toggleBtn);
 }
 
 function createTaskCard(task) {
@@ -480,12 +593,14 @@ function updateCounters() {
         done: 0,
     };
 
+    // считаем задачи по статусам
     appState.tasks.forEach((task) => {
         if (counts[task.status] !== undefined) {
             counts[task.status] += 1;
         }
     });
 
+    // обновляем счётчики колонок
     Object.entries(counts).forEach(([status, count]) => {
         const countElement = document.getElementById(statusMap[status].countId);
         if (countElement) {
@@ -493,10 +608,22 @@ function updateCounters() {
         }
     });
 
-    elements.totalTasksCount.textContent = appState.tasks.length;
+    const total = appState.tasks.length;
+    const active = total - counts.done;
+
+    // hero-метрики
+    elements.totalTasksCount.textContent = active;       // Актуальные
     elements.inProgressTasksCount.textContent = counts.progress;
     elements.doneTasksCount.textContent = counts.done;
     elements.todayTasksCount.textContent = counts.today;
+
+    //  ПРОГРЕСС
+    const percent = total === 0 ? 0 : Math.round((counts.done / total) * 100);
+
+    const progressEl = document.getElementById('progressText');
+    if (progressEl) {
+        progressEl.textContent = `Выполнено ${counts.done} из ${total} · ${percent}%`;
+    }
 }
 
 function updateEmptyStates() {
@@ -531,9 +658,8 @@ function updateFocusBlock() {
     const focusTask = sortedTodayTasks[0];
     const duePart = focusTask.dueDate ? ` Дедлайн: ${formatDate(focusTask.dueDate)}.` : '';
 
-    elements.focusTaskText.textContent = `${focusTask.title}.${duePart} ${
-        focusTask.description ? focusTask.description : ''
-    }`.trim();
+    elements.focusTaskText.textContent = `${focusTask.title}.${duePart} ${focusTask.description ? focusTask.description : ''
+        }`.trim();
 }
 
 function setupBoardDnD() {

@@ -20,7 +20,7 @@
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <a href="#dashboard" class="logo">
+                <a href="https://shumdev.ru/" target="_blank" class="logo">
                     <div class="logo-icon">
                         <img src="site/img/logo.png" alt="Логотип ShumDevKanban">
                     </div>
@@ -35,6 +35,11 @@
                 </nav>
 
                 <div class="header-actions">
+
+                    <button class="header-btn header-btn--ghost" id="themeToggle" type="button">
+                        Light Mode
+                    </button>
+
                     <button class="header-btn header-btn--ghost" type="button" id="clearDoneBtn">
                         Очистить Done
                     </button>
@@ -42,6 +47,7 @@
                     <button class="header-btn header-btn--primary" type="button" id="openTaskModalBtn">
                         + Новая задача
                     </button>
+
                 </div>
 
                 <button class="burger" aria-label="Меню">
@@ -84,7 +90,7 @@
                     <div class="hero__stats" id="stats">
                         <div class="hero__stat-card">
                             <span class="hero__stat-number" id="totalTasksCount">0</span>
-                            <span class="hero__stat-text">Всего задач</span>
+                            <span class="hero__stat-text">Актуальные</span>
                         </div>
 
                         <div class="hero__stat-card">
@@ -96,6 +102,10 @@
                             <span class="hero__stat-number" id="doneTasksCount">0</span>
                             <span class="hero__stat-text">Завершено</span>
                         </div>
+                    </div>
+
+                    <div class="hero__progress" id="progressText">
+                        Выполнено 0 из 0 · 0%
                     </div>
                 </div>
             </div>
@@ -133,6 +143,13 @@
                     <button class="board__add-btn" type="button" id="boardCreateTaskBtn">
                         <span>+ Новая задача</span>
                     </button>
+
+                    <div class="board__filters" id="filters">
+                        <button class="filter-btn active" data-filter="all">Все</button>
+                        <button class="filter-btn" data-filter="active">Актуальные</button>
+                        <button class="filter-btn" data-filter="done">Завершённые</button>
+                        <button class="filter-btn" data-filter="high">High</button>
+                    </div>
                 </div>
 
                 <div class="board__columns">
@@ -299,17 +316,18 @@
             </div>
 
             <p class="copyright">
-                © 2026. ShumDevKanban. Личная kanban-доска для задач, фокуса и продуктивной работы.
+                ShumDevKanban — приватная kanban-доска без регистрации.
+                Все данные хранятся только в вашем браузере.
             </p>
 
             <div class="footer__legal">
                 <p>
-                    Разработка: Шумилов Павел Дмитриевич
+                    Powered by <a href="https://shumdev.ru" target="_blank">ShumDev</a>
                 </p>
 
                 <div class="footer__legal-links">
                     <a href="mailto:infoShumdev@mail.ru">infoShumdev@mail.ru</a>
-                    <a href="tel:+79233906649">+7 (923) 390-66-49</a>
+                    <a href="https://shumdev.ru" target="_blank">shumdev.ru</a>
                 </div>
             </div>
         </div>

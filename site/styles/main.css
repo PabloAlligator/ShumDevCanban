@@ -372,6 +372,14 @@ a {
   gap: 16px;
   justify-content: center;
 }
+.hero__progress {
+  margin-top: 14px;
+  font-size: 14px;
+  color: #9fb0c8;
+}
+.hero__progress strong {
+  color: #fff;
+}
 .hero__stat-card {
   padding: 20px;
   border-radius: 18px;
@@ -487,6 +495,31 @@ a {
 .board__add-btn:hover {
   transform: translateY(-2px);
 }
+.board__filters {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.board__filters .filter-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #9fb0c8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.board__filters .filter-btn:hover {
+  color: #fff;
+  border-color: rgba(99, 102, 241, 0.4);
+}
+.board__filters .filter-btn.active {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  color: #fff;
+  border-color: transparent;
+}
 .board__columns {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -549,6 +582,23 @@ a {
 }
 .board-column__empty.is-hidden {
   display: none;
+}
+
+.task-list-toggle {
+  width: 100%;
+  margin-top: 12px;
+  height: 40px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #9fb0c8;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.task-list-toggle:hover {
+  color: #fff;
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .task-card {
@@ -1157,4 +1207,211 @@ a {
   .footer__legal a {
     font-size: 12px;
   }
+}
+body {
+  position: relative;
+  transition: color 0.3s ease;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  background: radial-gradient(circle at top left, rgba(180, 140, 90, 0.04), transparent 30%), linear-gradient(180deg, #f7f3ee 0%, #f3eee8 100%);
+}
+
+body.light::before {
+  opacity: 1;
+}
+
+.header,
+.task-card,
+.board-column,
+.hero__content,
+.hero__stats,
+.focus__box,
+.modal__dialog,
+.hero__stat-card,
+.focus__meta-item,
+.task-card__menu-btn,
+.filter-btn,
+.header-btn,
+.task-list-toggle,
+.task-form__input,
+.task-form__textarea,
+.task-form__select,
+.nav-link,
+.footer-link,
+.footer__legal-links a {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+}
+
+body.light {
+  color: #2b241f;
+}
+
+body.light .header {
+  background: rgba(255, 250, 245, 0.86);
+  border-bottom: 1px solid rgba(43, 36, 31, 0.05);
+  box-shadow: 0 6px 18px rgba(43, 36, 31, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+body.light .header.scrolled {
+  background: rgba(255, 250, 245, 0.94);
+}
+
+body.light .nav-link {
+  color: #6f6259;
+}
+
+body.light .nav-link:hover {
+  color: #8b5e3c;
+}
+
+body.light .header-btn--ghost {
+  background: rgba(255, 255, 255, 0.72);
+  color: #5f5248;
+  border: 1px solid rgba(43, 36, 31, 0.07);
+}
+
+body.light .header-btn--ghost:hover {
+  background: #fffaf5;
+  border-color: rgba(139, 94, 60, 0.14);
+}
+
+body.light .hero__content,
+body.light .hero__stats,
+body.light .focus__box,
+body.light .board-column,
+body.light .modal__dialog {
+  background: rgba(255, 252, 248, 0.86);
+  border: 1px solid rgba(43, 36, 31, 0.06);
+  box-shadow: 0 14px 28px rgba(43, 36, 31, 0.05);
+}
+
+body.light .hero__stat-card,
+body.light .focus__meta-item {
+  background: rgba(255, 248, 242, 0.95);
+  border: 1px solid rgba(43, 36, 31, 0.05);
+}
+
+body.light .hero__label,
+body.light .board-column__count,
+body.light .task-card__menu-btn {
+  background: #f3ece5;
+  color: #8a7b70;
+  border-color: rgba(43, 36, 31, 0.06);
+}
+
+body.light .hero__title,
+body.light .focus__title,
+body.light .board__title,
+body.light .board-column__head h3,
+body.light .task-card__title,
+body.light .modal__title,
+body.light .task-form__label,
+body.light .copyright,
+body.light .footer__legal p,
+body.light .footer-link {
+  color: #2b241f;
+}
+
+body.light .hero__text,
+body.light .focus__text,
+body.light .hero__stat-text,
+body.light .board__label,
+body.light .focus__label,
+body.light .task-card__text,
+body.light .task-card__status-label,
+body.light .task-card__date,
+body.light .footer__legal-links a {
+  color: #8a7b70;
+}
+
+body.light .task-card {
+  background: #fffaf5;
+  border: 1px solid rgba(43, 36, 31, 0.06);
+  box-shadow: 0 8px 18px rgba(43, 36, 31, 0.04);
+}
+
+body.light .task-card:hover {
+  border-color: rgba(139, 94, 60, 0.16);
+  box-shadow: 0 12px 22px rgba(139, 94, 60, 0.06);
+}
+
+body.light .board-column__empty {
+  background: #faf5ef;
+  border: 1px dashed rgba(43, 36, 31, 0.08);
+}
+
+body.light .board-column__empty p {
+  color: #8a7b70;
+}
+
+body.light .task-list-toggle {
+  background: #faf5ef;
+  border: 1px dashed rgba(43, 36, 31, 0.08);
+  color: #8a7b70;
+}
+
+body.light .task-list-toggle:hover {
+  background: #fffaf5;
+  color: #2b241f;
+}
+
+body.light .filter-btn {
+  background: rgba(255, 252, 248, 0.9);
+  border: 1px solid rgba(43, 36, 31, 0.08);
+  color: #8a7b70;
+}
+
+body.light .filter-btn:hover {
+  background: #fffaf5;
+  color: #2b241f;
+}
+
+body.light .filter-btn.active {
+  color: #fff;
+  box-shadow: 0 8px 18px rgba(139, 94, 60, 0.14);
+}
+
+body.light .task-form__input,
+body.light .task-form__textarea,
+body.light .task-form__select {
+  background: #fffaf5;
+  border: 1px solid rgba(43, 36, 31, 0.08);
+  color: #2b241f;
+}
+
+body.light .task-form__input::-moz-placeholder, body.light .task-form__textarea::-moz-placeholder {
+  color: #b2a59b;
+}
+
+body.light .task-form__input::placeholder,
+body.light .task-form__textarea::placeholder {
+  color: #b2a59b;
+}
+
+body.light .footer {
+  background: transparent;
+}
+
+body.light .footer-link:hover,
+body.light .footer__legal-links a:hover {
+  color: #8b5e3c;
+}
+
+body::before {
+  opacity: 0;
+  transition: opacity 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+body.light::before {
+  opacity: 1;
 }/*# sourceMappingURL=main.css.map */
